@@ -3,34 +3,34 @@
 ### The BASH script should be run on any new CENTOS 8 server....  It performs basic updating, configuration, and security....
 ### Run as root!
 
+####################################CHECK FOR ROOT################################
 ROOT_UID=0 #Root has $UID 0
 SUCCESS=0
 E_USEREXISTS=70
 E_NOTROOT=65 #Not root
-
-#Run as root, and this checks to see if the creater is in root. If not, will not run
+###Run as root, and this checks to see if the creater is in root. If not, will not run
 if [ "$UID" -ne "$ROOT_UID" ]; then
 echo "Sorry must be in root to run this script"
 exit $E_NOTROOT
 fi
+
+################################## YUM UPDATE ####################################
 echo "*********************************************************************"
 echo "*********************************************************************"
 echo "UPDATING SYSTEM WITH YUM"
 echo "*********************************************************************"
-
-#set your timezone here:
+###set your timezone here:
 timedatectl set-timezone America/New_York 
-
 yum -y install epel-release nano
 yum -y update
-
 echo "*********************************************************************"
 echo "*********************************************************************"
 echo "YUM UPDATE COMPLETE"
 echo "*********************************************************************"
 echo "*********************************************************************"
 echo "*********************************************************************"
-############################################################################
+
+############################# ##SETUP USER ######################################
 echo "*************************Setup a non-root user.**********************"
 echo "*********************************************************************"
 echo "What is your new username: "
@@ -76,6 +76,7 @@ echo "*********************************************************************"
 echo "/etc/hosts file updated"
 echo "*********************************************************************"
 echo "*********************************************************************"
+
 ##################### Create more robust hostfile logging ##################
 echo 'export HISTSIZE=' >> ~/.bashrc
 echo 'export HISTSIZE=' >> /home/$usernm/.bashrc

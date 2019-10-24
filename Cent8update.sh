@@ -100,36 +100,38 @@ echo "tty1" > /etc/securetty
 ######################### LOCK DOWN ROOT FOLDER TO ONLY ROOT ###################
 chmod 700 /root
 
-########################### FIREWALL-D CONFIG - SSH ON 22222 ####################
+############################ CONFIGURE SSHD #################################
+### What Port?
+echo "What TCP port should sshd run on?"
+read sshPort
+### Root login not allowed
+sed -i "/PermitRootLogin yes/c\PermitRootLogin no" /etc/ssh/sshd_config
+### Only Protocol 2 - write on line after Port
+sed -i 's/.*Port 22.*/&\nProtocol 2/' /etc/ssh/sshd_config
+### SSHD Port - set here and in FW
+sed -i "s/#Port 22/Port $sshPort/" /etc/ssh/sshd_config
+systemctl restart sshd
+echo "SSHD Configuration Complete..."
+
+########################### FIREWALL-D CONFIG - ####################
 echo "Setup Firewalld"
 systemctl enable firewalld
 systemctl start firewalld
 echo "firewall update"
-firewall-cmd --add-port 22222/tcp
+firewall-cmd --add-port $sshPort/tcp --permanent
 echo "firewall update"
-firewall-cmd --add-port 22222/tcp --permanent
+firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport $sshPort -m state --state NEW -m recent --set
 echo "firewall update"
-firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT_direct 0 -p tcp --dport 22222 -m state --state NEW -m recent --set
-echo "firewall update"
-firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport 22222 -m state --state NEW -m recent --update --seconds 30 --hitcount 4 -j REJECT --reject-with tcp-reset
+firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT_direct 1 -p tcp --dport $sshPort -m state --state NEW -m recent --update --seconds 30 --hitcount 4 -j REJECT --reject-with tcp-reset
 echo "firewall update"
 firewall-cmd --reload
 echo "Firewalld configuration complete... "
 
-############################ CONFIGURE SSHD #################################
-######## Root login not allowed
-sed -i "/PermitRootLogin yes/c\PermitRootLogin no" /etc/ssh/sshd_config
-### Only Protocol 2
-echo "Protocol 2" >> /etc/ssh/sshd_config
-### Odd Port - set here and in FW
-echo "Port 22222" >> /etc/ssh/sshd_config
-systemctl restart sshd
-echo "SSHD Configuration Complete..."
 echo "########################################################################"
 echo "########################################################################"
 echo "########################################################################"
 echo "######################## CONFIG COMPLETE ################################"
-echo "####################### SSHD  on port 22222 #################################"
+echo "####################### SSHD  on port $sshPort###########################"
 echo "########################################################################"
 echo "########################################################################"
 echo "########################################################################"

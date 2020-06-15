@@ -54,8 +54,8 @@ echo "INSTALL DNF AUTOMATIC to run security updates automatically"
 dnf install -y dnf-automatic
 ### UPDATE /etc/dnf/automatic.conf 
 echo "UPDATING DNF AUTOMATIC.CONF FILE"
-sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic
-sed -i 's/upgrade_type = default/upgrade_type = security/' /etc/dnf/automatic
+sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
+sed -i 's/upgrade_type = default/upgrade_type = security/' /etc/dnf/automatic.conf
 systemctl enable dnf-automatic.timer && systemctl start dnf-automatic.timer
 echo "*********************************************************************"
 echo "*********************************************************************"
